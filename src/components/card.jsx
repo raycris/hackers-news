@@ -8,7 +8,7 @@ import ClockSVG from "../assets/icon/clock.svg";
 const API = "https://hn.algolia.com/api/v1/search_by_date?query=angular&page=0";
 
 const Card = () => {
-  const [full, setFull] = useState(true);
+  const [isClicked, setIsClicked] = useState();
   const [information, setInformation] = useState([]);
   useEffect(() => {
     fetch(API)
@@ -19,10 +19,6 @@ const Card = () => {
       });
   }, []);
 
-  const handler = () => {
-    setFull(!full);
-    console.log("klk");
-  };
   return (
     <>
       {information.map((item) => (
@@ -33,15 +29,19 @@ const Card = () => {
           <CardContainer>
             <TimeContainer>
               <ClockImage src={ClockSVG} />
-              <LabelTime>hours ago by {item.author}</LabelTime>
+              <LabelTime>
+                {item.created_at} hours ago by {item.author}
+              </LabelTime>
             </TimeContainer>
             <Label>{item.story_title}</Label>
           </CardContainer>
           <HeartContainer>
             <Image
-              src={full ? EmptyHeartSVG : FullHeartSVG}
-              alt={full ? "Empty Heart" : "Full Heart"}
-              onClick={handler}
+              onClick={() => setIsClicked(item.created_at_i)}
+              src={
+                isClicked === item.created_at_i ? FullHeartSVG : EmptyHeartSVG
+              }
+              alt={isClicked ? "Empty Heart" : "Full Heart"}
             />
           </HeartContainer>
         </Container>
@@ -53,15 +53,13 @@ const Card = () => {
 export default Card;
 
 const Container = styled.span`
-  /* background-color: red; */
-  display: flex;
-  justify-content: space-between;
-  /* align-items: center; */
-  flex-direction: row;
-  flex-wrap: wrap;
-  border-radius: 6px;
   margin: 16px;
   border: solid 1px #979797;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 6px;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const CardContainer = styled.div`
@@ -70,9 +68,9 @@ const CardContainer = styled.div`
   margin: 1.3rem 5.3rem;
   opacity: 0.8;
   display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
   border-radius: 6px;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
 const HeartContainer = styled.picture`
@@ -80,10 +78,10 @@ const HeartContainer = styled.picture`
   height: 5.625rem;
   margin: 0 0 0 1rem;
   padding: 2.188rem 1.375rem 2.063rem;
+  display: flex;
+  align-items: center;
   border-radius: 6px;
   justify-content: center;
-  align-items: center;
-  display: flex;
 
   background-color: #f5f5f5;
 `;
@@ -112,8 +110,8 @@ const TimeContainer = styled.span`
   justify-content: flex-start;
 `;
 const LabelTime = styled.span`
-  font-size: 1.288rem;
   color: #767676;
+  font-size: 1.288rem;
   /* height: 0.813rem;
   margin: 1rem 20.313rem 0.438rem 0.5rem; */
 `;
